@@ -18,14 +18,12 @@ func Upload(path string, faster bool) error {
 	t := time.Now()
 	color.Yellow("upload started at: %s", t.Format(time.RFC1123))
 
-	//checkForFileChanges()
-
 	newFile, err := compress(path, faster)
 	if err != nil {
 		return err
 	}
 	defer cleanup(newFile)
-	color.Red("config path inside upload: %s", newFile)
+
 	hash, err := skynet.UploadFile(newFile, skynet.DefaultUploadOptions)
 	if err != nil {
 		return fmt.Errorf("error uploading file to skynet: %w", err)
@@ -62,7 +60,7 @@ func compress(filename string, faster bool) (string, error) {
 		return "", err
 	}
 
-	encData, err := crypto.EncryptAES([]byte(cfg.Password), []byte("hello world"))
+	encData, err := crypto.EncryptAES([]byte(cfg.Password), input)
 	if err != nil {
 		color.Red("error in ecnrypt: %s", cfg.Password)
 		return "", err

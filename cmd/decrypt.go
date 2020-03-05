@@ -19,7 +19,6 @@ var decryptCmd = &cobra.Command{
 
 		if len(args) == 0 {
 			errMsg := color.RedString("please provide the encrypted file")
-
 			return fmt.Errorf("%s", errMsg)
 		}
 

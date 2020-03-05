@@ -5,13 +5,14 @@ import (
 	"log"
 )
 
-func Watcher(path string, faster bool, done chan bool) {
+func Watcher(path string, faster bool) {
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer watcher.Close()
 
+	done := make(chan bool)
 	go func() {
 		for {
 			select {
@@ -23,8 +24,6 @@ func Watcher(path string, faster bool, done chan bool) {
 				if event.Op&fsnotify.Write == fsnotify.Write {
 					log.Println("modified file:", event.Name)
 				}
-
-				go Upload(path, faster)
 			case err, ok := <-watcher.Errors:
 				if !ok {
 					return

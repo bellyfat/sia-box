@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"github.com/fatih/color"
 	"github.com/jay-dee7/sia-box/config"
 	"github.com/jay-dee7/sia-box/skynet"
 	"github.com/spf13/cobra"
@@ -20,13 +19,12 @@ var syncCmd = &cobra.Command{
 			return err
 		}
 
-		color.Red("entire config: %s", cfg)
 		if watch {
 			if err = skynet.Upload(cfg.Path, faster); err != nil {
 				return err
 			}
-			done := make(chan bool)
-			skynet.Watcher(cfg.Path, faster, done)
+			//done := make(chan bool)
+			skynet.Watcher(cfg.Path, faster)
 		}
 
 		return skynet.Upload(cfg.Path, faster)

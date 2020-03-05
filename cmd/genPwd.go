@@ -40,16 +40,13 @@ Characters can include Upper Case, Lower Case, Numbers and Special Characters
 		cfg.Password = pwd
 		err = cfg.Update()
 		if err != nil {
-			color.Red("error updating passowrd in config: %s", err)
+			color.Red("error updating password in config: %s", err)
 			return err
 		}
 
 		dir, _ := os.UserHomeDir()
 		dir = fmt.Sprintf("%s/.sia-box/sia-box.yaml", dir)
 		color.Green("it has also been saved in the config file present at: \n \t %s", dir)
-
-		cfg, _ = config.Read()
-		color.Yellow("pass: %s", cfg.Password)
 		return nil
 	},
 }
