@@ -8,7 +8,7 @@ import (
 )
 
 func EncryptAES(key []byte, data []byte) ([]byte, error) {
-	block, err := aes.NewCipher(key)
+	block, err := aes.NewCipher(key[:32])
 	if err != nil {
 		return nil, err
 	}
@@ -27,7 +27,7 @@ func EncryptAES(key []byte, data []byte) ([]byte, error) {
 }
 
 func DecryptAES(key []byte, data []byte) ([]byte, error) {
-	block, err := aes.NewCipher(key)
+	block, err := aes.NewCipher(key[:32])
 	if err != nil {
 		return nil, err
 	}

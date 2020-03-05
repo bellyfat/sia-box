@@ -21,8 +21,11 @@ func Upload(path string, faster bool) error {
 	//checkForFileChanges()
 
 	newFile, err := compress(path, faster)
+	if err != nil {
+		return err
+	}
 	defer cleanup(newFile)
-	color.Red("config path inside upload: %s", path)
+	color.Red("config path inside upload: %s", newFile)
 	hash, err := skynet.UploadFile(newFile, skynet.DefaultUploadOptions)
 	if err != nil {
 		return fmt.Errorf("error uploading file to skynet: %w", err)
@@ -41,7 +44,7 @@ func compress(filename string, faster bool) (string, error) {
 		return "", fmt.Errorf("error while reading data from source: %w", err)
 	}
 
-	tmpFile := fmt.Sprintf("skynet-comp-%d", time.Now().UnixNano())
+	tmpFile := fmt.Sprintf("%s-%d", filename, time.Now().UnixNano())
 	file, err := os.OpenFile(tmpFile, os.O_CREATE|os.O_RDWR, os.ModePerm)
 	if err != nil {
 		return "", err
@@ -53,16 +56,21 @@ func compress(filename string, faster bool) (string, error) {
 		_, _ = io.Copy(file, bytes.NewBuffer(comp))
 		return file.Name(), nil
 	}
-
-	comp := snappy.EncodeBetter(nil, input)
-
-	cfg, _ := config.Read()
-	encData, err := crypto.EncryptAES([]byte(cfg.Password), comp)
+	cfg, err := config.Read()
 	if err != nil {
+		color.Red("error while reading config: %s", err)
 		return "", err
 	}
 
-	_, _ = io.Copy(file, bytes.NewBuffer(encData))
+	encData, err := crypto.EncryptAES([]byte(cfg.Password), []byte("hello world"))
+	if err != nil {
+		color.Red("error in ecnrypt: %s", cfg.Password)
+		return "", err
+	}
+
+	comp := snappy.EncodeBetter(nil, encData)
+
+	_, _ = io.Copy(file, bytes.NewBuffer(comp))
 
 	return file.Name(), nil
 }
